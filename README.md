@@ -1,19 +1,26 @@
-<div align="center">
+# F1 Data Analysis
 
-<img width="100%" src="https://capsule-render.vercel.app/api?type=waving&color=0:0d1117,50:e11d48,100:dc2626&height=200&section=header&text=F1+Data+Analysis&fontSize=58&fontColor=ffffff&fontAlignY=38&desc=Formula+1+Verisi+Üzerine+Full-Stack+Analiz+Platformu&descAlignY=58&descAlign=50&animation=fadeIn" />
+**Python · SQL · PostgreSQL · FastAPI · React**
 
-</div>
+2024 ve 2025 Formula 1 sezonlarındaki yarış, sürücü ve takım verilerini analiz etmek için geliştirdiğim web uygulaması. Python tabanlı API, PostgreSQL sorguları ve etkileşimli arayüzü bir araya getiriyor.
 
-> **"Veriden pist stratejisi oku."**  
-> 2024-2025 Formula 1 sezonlarını kapsayan, PostgreSQL tabanlı büyük veri analizi yapan, RAM-verimli sorgu mimarisi ile tasarlanmış web platformu.
+> **Kısaca:** Ham yarış verilerinden sürücü performansı, tur süreleri ve takım karşılaştırmaları üretmek.
+
+### Bu projede neler var?
+
+- **Veri analizi:** yarış sonuçları, tur süreleri, podyum ve DNF oranlarının karşılaştırılması
+- **SQL ve veritabanı:** yıl bazlı tablolar, parametrik sorgular, `UNION ALL` ve sayfalama
+- **Uygulama geliştirme:** FastAPI servisleri ve React tabanlı analiz ekranları
+
+**English:** A Formula 1 data analysis app for the 2024–2025 seasons, combining PostgreSQL queries, a Python/FastAPI backend and interactive driver/team comparisons.
 
 ---
 
 ## 💡 Fikir ve Motivasyon
 
-F1 büyük veri problemidir. Her yarış yüzlerce sürücü verisi, binlerce tur zamanı, pit stop stratejileri, DNF oranları... Bunları anlamlı grafiklerle görmek istedim.
+Formula 1 verilerinde yarış sonuçları, tur zamanları ve takım performansı farklı tablolarda tutuluyor. Bu bilgileri ortak bir analiz arayüzünde birleştirmek ve anlamlı karşılaştırmalar üretmek istedim.
 
-**Temel tasarım kararı:** Tüm veriyi çekmek yerine, frontend filtreleme + backend pagination + UNION ALL sorgu stratejisi. Böylece milyonlarca satır veri olsa bile uygulama hızlı kalıyor.
+**Temel tasarım kararı:** Tüm veriyi çekmek yerine, frontend filtreleme + backend pagination + UNION ALL sorgu stratejisi. Bu yaklaşım, gereksiz veri aktarımını ve bellekte tutulan sonuç miktarını azaltmayı hedefliyor.
 
 ---
 
@@ -152,5 +159,4 @@ f"SELECT * FROM results WHERE driver = '{driver_id}'"
 <img src="https://img.shields.io/badge/SQLAlchemy-ORM-D71F00?style=flat-square" />
 <img src="https://img.shields.io/badge/F1-2024--2025-E10600?style=flat-square" />
 
-<img width="100%" src="https://capsule-render.vercel.app/api?type=waving&color=0:dc2626,50:e11d48,100:0d1117&height=100&section=footer" />
 </div>
