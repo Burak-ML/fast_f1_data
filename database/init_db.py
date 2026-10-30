@@ -2,8 +2,10 @@ import os
 from sqlalchemy import text
 from sqlalchemy import create_engine
 
-# Railway bağlantı adresiniz (Hardcoded)
-DB_URL = "postgresql://postgres:qFMUkSMAoKakangFgvKXgoLpjjhUuWHM@hayabusa.proxy.rlwy.net:34011/railway"
+# Bağlantı adresi ortam değişkeninden okunur (.env dosyası repoya eklenmez)
+DB_URL = os.getenv("DATABASE_URL")
+if not DB_URL:
+    raise RuntimeError("DATABASE_URL environment variable is required")
 
 
 def init_database():
