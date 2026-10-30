@@ -26,16 +26,23 @@ export function Navbar() {
         >
           DASHBOARD
         </Link>
+
+        <Link 
+          to="/predict"
+          className={`font-label-lg text-label-lg transition-colors pb-1 ${location.pathname === '/predict' ? 'text-primary border-b-2 border-primary' : 'text-on-surface hover:text-primary'}`}
+        >
+          PREDICT
+        </Link>
       </nav>
       
       <div className="hidden md:block">
-        <Link to="/dashboard">
+        <Link to="/predict">
           <motion.button 
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             className="px-6 py-2 rounded-full bg-primary text-on-primary font-label-lg text-label-lg uppercase tracking-wide hover:bg-primary-fixed btn-glow transition-all duration-300"
           >
-            LIVE PREDICTIONS
+            PREDICT A RACE
           </motion.button>
         </Link>
       </div>

@@ -1,10 +1,12 @@
 from fastapi import FastAPI
 from backend.app.routes.analysis import router as analysis_router
+from backend.app.routes.predict import router as predict_router
 from backend.app.services.f1_analysis_service import F1AnalysisService
 
 app = FastAPI(title="F1 Data Analysis API")
 
 app.include_router(analysis_router, prefix="/analysis", tags=["analysis"])
+app.include_router(predict_router, prefix="/predict", tags=["predict"])
 
 @app.get("/", tags=["root"])
 def root():

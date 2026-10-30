@@ -69,6 +69,27 @@ class F1AnalysisService:
 
 ---
 
+## 🔮 Yarış Sonucu Tahmini
+
+Sürücü, takım, pist, başlangıç sırası ve hava durumu (hava/pist sıcaklığı, yağmur) seçilerek sürücünün kaçıncı bitireceği tahmin edilir.
+
+- **Model:** `ml/model.py`, scikit-learn `HistGradientBoostingRegressor`
+- **Değerlendirme:** Son yarışlar eğitimden ayrılır (zamana göre bölme). Model, "sürücü başladığı sırada bitirir" varsayımıyla karşılaştırılır; sonuç `ml/artifacts/metrics.json` içinde ve arayüzde gösterilir.
+- **Sınırlar:** Güvenlik aracı, yağmur değişimi ve arızalar tahmin edilemez. Bitirmeyen sürücüler (DNF) eğitim verisine alınmaz.
+
+```bash
+# 1) Eğitim verisini ml/data/race_dataset.csv olarak hazırla (sütunlar: ml/data/README.md)
+python -m ml.train --data ml/data/race_dataset.csv
+
+# 2) API: GET /predict/options, POST /predict
+uvicorn backend.app.main:app --reload
+# 3) Arayüz: http://localhost:5173/predict
+```
+
+Testler: `python -m pytest test_ml.py` (yapay veriyle sadece boru hattını doğrular).
+
+---
+
 ## 🛠️ Tech Stack
 
 | Katman | Teknoloji |
