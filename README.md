@@ -85,13 +85,14 @@ tahmin = bu başlangıç sırasından genelde bitilen yer   (yalnızca kuru yar�
 - **Sınırlar:** Güvenlik aracı ve arızalar tahmin edilemez. Bitirmeyen sürücüler (DNF) veriye alınmaz.
 
 ```bash
-# Veriyi analysis/data/race_dataset.csv olarak hazırla (sütunlar: analysis/data/README.md)
+# Veriyi indir (OpenF1, anahtar gerekmez) -> analysis/data/race_dataset.csv
+python -m analysis.collect --years 2024 2025
 python -m analysis.report          # doğruluk raporu
 uvicorn backend.app.main:app --reload   # GET /predict/options, POST /predict
 # Arayüz: http://localhost:5173/predict
 ```
 
-Testler: `python -m pytest test_ml.py` (yapay veriye bilinçli etkiler yerleştirir, hesabın bunları bulduğunu doğrular).
+Testler: `python -m pytest test_ml.py test_collect.py`. Hesap testleri yapay veriye bilinçli etkiler yerleştirip bulunduğunu doğrular; toplayıcı testleri sahte bir OpenF1 yanıtıyla çevrimdışı çalışır. Veri formatı ve toplama ayrıntıları: `analysis/data/README.md`.
 
 ---
 

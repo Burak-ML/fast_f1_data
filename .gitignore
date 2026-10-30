@@ -145,3 +145,6 @@ vite.config.ts.timestamp-*
 # Python
 __pycache__/
 *.pyc
+
+# Downloaded API cache (rebuilt by analysis.collect)
+analysis/data/raw/
