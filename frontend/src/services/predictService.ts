@@ -2,15 +2,14 @@ const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
 
 export interface PredictOptions {
   drivers: string[];
-  constructors: string[];
-  circuits: string[];
   grid_max: number;
   metrics: {
     rows: number;
     races: number;
     test_races: number;
-    mae_model: number;
     mae_grid_baseline: number;
+    mae_grid_curve: number;
+    mae_full: number;
     beats_baseline: boolean;
     within_3_positions: number;
     typical_error: number;
@@ -19,10 +18,7 @@ export interface PredictOptions {
 
 export interface PredictInput {
   driver_id: string;
-  constructor_id: string;
-  circuit_id: string;
   grid: number;
-  air_temperature: number;
   track_temperature: number;
   rainfall: boolean;
 }
@@ -32,6 +28,9 @@ export interface PredictResult {
   raw_position: number;
   likely_range: [number, number];
   typical_error: number;
+  known_driver: boolean;
+  condition: 'rain' | 'hot' | 'cool';
+  breakdown: { grid_slot: number; team: number; driver: number; weather: number };
 }
 
 async function request<T>(path: string, init?: RequestInit): Promise<T> {

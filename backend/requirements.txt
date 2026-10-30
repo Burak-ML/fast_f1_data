@@ -3,6 +3,5 @@ uvicorn[standard]
 sqlalchemy
 psycopg2-binary
 python-dotenv
-scikit-learn>=1.4
 pandas
-joblib
+numpy

@@ -71,22 +71,27 @@ class F1AnalysisService:
 
 ## 🔮 Yarış Sonucu Tahmini
 
-Sürücü, takım, pist, başlangıç sırası ve hava durumu (hava/pist sıcaklığı, yağmur) seçilerek sürücünün kaçıncı bitireceği tahmin edilir.
+Sürücü, başlangıç sırası, pist sıcaklığı ve yağmur seçilerek sürücünün kaçıncı bitireceği hesaplanır. Makine öğrenmesi modeli **eğitilmez**; geçmiş yarışlardan çıkarılan istatistiklerle (pandas) hesap yapılır ve sonucun nereden geldiği ekranda gösterilir.
 
-- **Model:** `ml/model.py`, scikit-learn `HistGradientBoostingRegressor`
-- **Değerlendirme:** Son yarışlar eğitimden ayrılır (zamana göre bölme). Model, "sürücü başladığı sırada bitirir" varsayımıyla karşılaştırılır; sonuç `ml/artifacts/metrics.json` içinde ve arayüzde gösterilir.
-- **Sınırlar:** Güvenlik aracı, yağmur değişimi ve arızalar tahmin edilemez. Bitirmeyen sürücüler (DNF) eğitim verisine alınmaz.
-
-```bash
-# 1) Eğitim verisini ml/data/race_dataset.csv olarak hazırla (sütunlar: ml/data/README.md)
-python -m ml.train --data ml/data/race_dataset.csv
-
-# 2) API: GET /predict/options, POST /predict
-uvicorn backend.app.main:app --reload
-# 3) Arayüz: http://localhost:5173/predict
+```
+tahmin = bu başlangıç sırasından genelde bitilen yer   (yalnızca kuru yarışlardan)
+       + takımın sıradan kazandırdığı / kaybettirdiği
+       + sürücünün takımının üstüne kattığı
+       + yağmurun / sıcak pistin sıralamayı ortaya doğru karıştırması
 ```
 
-Testler: `python -m pytest test_ml.py` (yapay veriyle sadece boru hattını doğrular).
+- **Küçük örneklem koruması:** Az yarışa dayanan her etki sıfıra doğru küçültülür; tek iyi hafta sonu bir sürücüyü olduğundan iyi göstermez.
+- **Doğrulama:** Son yarışlar hesaba katılmaz, sonra bu yarışlar tahmin edilir. Sonuç "sürücü başladığı sırada bitirir" varsayımıyla karşılaştırılır (`python -m analysis.report`), her adımın katkısı ayrı ayrı görünür.
+- **Sınırlar:** Güvenlik aracı ve arızalar tahmin edilemez. Bitirmeyen sürücüler (DNF) veriye alınmaz.
+
+```bash
+# Veriyi analysis/data/race_dataset.csv olarak hazırla (sütunlar: analysis/data/README.md)
+python -m analysis.report          # doğruluk raporu
+uvicorn backend.app.main:app --reload   # GET /predict/options, POST /predict
+# Arayüz: http://localhost:5173/predict
+```
+
+Testler: `python -m pytest test_ml.py` (yapay veriye bilinçli etkiler yerleştirir, hesabın bunları bulduğunu doğrular).
 
 ---
 
