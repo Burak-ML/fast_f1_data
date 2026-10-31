@@ -1,8 +1,11 @@
 import os
+
+from dotenv import load_dotenv
 from sqlalchemy import text
 from sqlalchemy import create_engine
 
-# Bağlantı adresi ortam değişkeninden okunur (.env dosyası repoya eklenmez)
+# The connection string comes from the environment (.env files are not committed)
+load_dotenv()
 DB_URL = os.getenv("DATABASE_URL")
 if not DB_URL:
     raise RuntimeError("DATABASE_URL environment variable is required")

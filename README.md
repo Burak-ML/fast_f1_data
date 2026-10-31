@@ -1,194 +1,137 @@
 # F1 Data Analysis
 
-**Python · SQL · PostgreSQL · FastAPI · React**
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+![Python](https://img.shields.io/badge/Python-FastAPI-009688?logo=fastapi&logoColor=white)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-316192?logo=postgresql&logoColor=white)
+![React](https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=black)
 
-2024 ve 2025 Formula 1 sezonlarındaki yarış, sürücü ve takım verilerini analiz etmek için geliştirdiğim web uygulaması. Python tabanlı API, PostgreSQL sorguları ve etkileşimli arayüzü bir araya getiriyor.
+**A Formula 1 analytics app for the 2024 and 2025 seasons: PostgreSQL queries, a FastAPI backend and a React dashboard.**
 
-> **Kısaca:** Ham yarış verilerinden sürücü performansı, tur süreleri ve takım karşılaştırmaları üretmek.
+Race results, lap times, pit stops and weather live in separate tables. This project brings them together behind one API so drivers, teams and circuits can be compared in an interactive interface. It also includes a small statistical module that estimates where a driver is likely to finish.
 
-### Bu projede neler var?
+## Features
 
-- **Veri analizi:** yarış sonuçları, tur süreleri, podyum ve DNF oranlarının karşılaştırılması
-- **SQL ve veritabanı:** yıl bazlı tablolar, parametrik sorgular, `UNION ALL` ve sayfalama
-- **Uygulama geliştirme:** FastAPI servisleri ve React tabanlı analiz ekranları
+- **Driver analysis:** performance ranking (wins, podiums, DNF rate), average lap time, sector times, consistency, pit stops and positions gained or lost.
+- **Team analysis:** performance ranking and driver-pair consistency.
+- **Circuit and season views:** per-circuit performance, race results and strategy, championship progress.
+- **Efficient queries:** per-season tables are combined with parameterized `UNION ALL` queries, results are paginated (`limit` / `offset`) and connections are pooled, so the browser never receives more data than it shows.
+- **Race position estimate:** a statistics-based estimate from grid slot, driver, team and weather (see below).
 
-**English:** A Formula 1 data analysis app for the 2024–2025 seasons, combining PostgreSQL queries, a Python/FastAPI backend and interactive driver/team comparisons.
-
----
-
-## 💡 Fikir ve Motivasyon
-
-Formula 1 verilerinde yarış sonuçları, tur zamanları ve takım performansı farklı tablolarda tutuluyor. Bu bilgileri ortak bir analiz arayüzünde birleştirmek ve anlamlı karşılaştırmalar üretmek istedim.
-
-**Temel tasarım kararı:** Tüm veriyi çekmek yerine, frontend filtreleme + backend pagination + UNION ALL sorgu stratejisi. Bu yaklaşım, gereksiz veri aktarımını ve bellekte tutulan sonuç miktarını azaltmayı hedefliyor.
-
----
-
-## 🏗️ Mimari
+## Architecture
 
 ```
-Frontend (React + TypeScript + Vite)
-    ↓ Filtre parametreleri
-FastAPI Backend (Python)
-    ↓ Parameterize SQL + UNION ALL
-PostgreSQL (Railway)
-    ├── results_2024
-    ├── results_2025
-    ├── lap_times_2024
-    ├── lap_times_2025
-    └── ...
+OpenF1 data (JSON)
+      |
+   worker/   collectors, loaders, cleaning
+      |
+ PostgreSQL  results_*, laps_*, pit_stops_*, weather_* ... per season
+      |
+ FastAPI     backend/app, parameterized SQL via SQLAlchemy
+      |
+ React       frontend/ (Vite, TypeScript, Tailwind, Recharts)
 ```
 
-**RAM-Verimli Sorgu Mimarisi:**
-```python
-class F1AnalysisService:
-    # Yıl bazında UNION ALL sorguları
-    # Pagination (limit/offset)
-    # Parameterized queries (SQL injection güvenli)
-    # SQLAlchemy connection pooling
-```
+The database schema is in [`database/schema.sql`](database/schema.sql). Tables are split by season (2024, 2025) and by session type (race, practice).
 
----
+## Getting started
 
-## ⚙️ Analiz Modülleri
+Requirements: Python 3.10+, Node.js 18+ and a PostgreSQL database.
 
-### 🏎️ Sürücü Analizi
-- **Performans Sıralaması** — kazanma, podyum, DNF oranı
-- **Tur Süresi Analizi** — en iyi tur, ortalama, tutarlılık
-- **Yarış Bazında Karşılaştırma** — sürücüler arası
-
-### 🏭 Takım / Constructor Analizi
-- Takım puan gelişimi (sezon boyunca)
-- Takım güvenilirlik skoru
-- Sürücü çift performans karşılaştırması
-
-### 🗓️ Sezon Görünümü
-- 2024-2025 sezon verileri
-- Pist bazında analizler
-- Hava koşulu etkisi
-
----
-
-## 🔮 Yarış Sonucu Tahmini
-
-Sürücü, başlangıç sırası, pist sıcaklığı ve yağmur seçilerek sürücünün kaçıncı bitireceği hesaplanır. Makine öğrenmesi modeli **eğitilmez**; geçmiş yarışlardan çıkarılan istatistiklerle (pandas) hesap yapılır ve sonucun nereden geldiği ekranda gösterilir.
-
-```
-tahmin = bu başlangıç sırasından genelde bitilen yer   (yalnızca kuru yarışlardan)
-       + takımın sıradan kazandırdığı / kaybettirdiği
-       + sürücünün takımının üstüne kattığı
-       + yağmurun / sıcak pistin sıralamayı ortaya doğru karıştırması
-```
-
-- **Küçük örneklem koruması:** Az yarışa dayanan her etki sıfıra doğru küçültülür; tek iyi hafta sonu bir sürücüyü olduğundan iyi göstermez.
-- **Doğrulama:** Son yarışlar hesaba katılmaz, sonra bu yarışlar tahmin edilir. Sonuç "sürücü başladığı sırada bitirir" varsayımıyla karşılaştırılır (`python -m analysis.report`), her adımın katkısı ayrı ayrı görünür.
-- **Sınırlar:** Güvenlik aracı ve arızalar tahmin edilemez. Bitirmeyen sürücüler (DNF) veriye alınmaz.
+### 1. Database and data
 
 ```bash
-# Veriyi indir (OpenF1, anahtar gerekmez) -> analysis/data/race_dataset.csv
-python -m analysis.collect --years 2024 2025
-python -m analysis.report          # doğruluk raporu
-uvicorn backend.app.main:app --reload   # GET /predict/options, POST /predict
-# Arayüz: http://localhost:5173/predict
+cd worker
+cp .env.example .env              # set DATABASE_URL
+cd ../database && python init_db.py   # creates the tables from schema.sql
+cd .. && python -m worker.main    # loads, cleans and summarizes the data
 ```
 
-Testler: `python -m pytest test_ml.py test_collect.py`. Hesap testleri yapay veriye bilinçli etkiler yerleştirip bulunduğunu doğrular; toplayıcı testleri sahte bir OpenF1 yanıtıyla çevrimdışı çalışır. Veri formatı ve toplama ayrıntıları: `analysis/data/README.md`.
+`DATABASE_URL` takes the form `postgresql://USER:PASSWORD@HOST:5432/DATABASE`. The loader reads OpenF1 JSON files from an `f1_data/` directory. Downloading those files is not part of this repository yet.
 
----
+### 2. Backend
 
-## 🛠️ Tech Stack
-
-| Katman | Teknoloji |
-|--------|-----------|
-| Backend | Python, FastAPI |
-| ORM / SQL | SQLAlchemy, Ham SQL (UNION ALL) |
-| Veritabanı | PostgreSQL (Railway) |
-| Frontend | React 19, TypeScript, Vite |
-| Stil | TailwindCSS |
-| Veri Güvenliği | Parameterized queries |
-
----
-
-## 📁 Proje Yapısı
-
-```
-f1DataAnalysis/
-├── backend/
-│   ├── requirements.txt
-│   └── app/
-│       ├── main.py                  # FastAPI + health check
-│       ├── routes/
-│       │   └── analysis.py          # API endpoint'leri
-│       └── services/
-│           ├── f1_analysis_service.py  # Ana analiz motoru (510 satır)
-│           └── analysis_service.py    # Yardımcı sorgular
-├── frontend/
-│   └── src/                         # React + TypeScript UI
-├── database/                        # SQL şemaları ve seed
-├── docs/                            # Teknik dokümantasyon
-└── test_backend.py                  # Backend test suite
-```
-
----
-
-## 🚀 Kurulum
-
-### Backend
 ```bash
 cd backend
 pip install -r requirements.txt
-cp .env.example .env
-# DATABASE_URL=postgresql://...
-uvicorn app.main:app --reload
-# → http://localhost:8000/docs
+cp .env.example .env              # set DATABASE_URL
+cd .. && uvicorn backend.app.main:app --reload
 ```
 
-### Frontend
+Interactive API docs: http://localhost:8000/docs
+
+### 3. Frontend
+
 ```bash
 cd frontend
 npm install
 npm run dev
-# → http://localhost:5173
 ```
 
----
+Open http://localhost:5173. Set `VITE_API_URL` if the backend is not on `http://localhost:8000`.
 
-## 🔗 API Endpoint'leri
+## API
 
-| Endpoint | Açıklama |
-|----------|----------|
-| `GET /` | API durum kontrolü |
-| `GET /health` | PostgreSQL bağlantı testi |
-| `GET /analysis/drivers` | Sürücü performans sıralaması |
-| `GET /analysis/constructors` | Takım analizi |
-| `GET /analysis/laps` | Tur süresi verileri |
+| Endpoint | Description |
+|----------|-------------|
+| `GET /health` | PostgreSQL connection check |
+| `GET /analysis/driver/performance-ranking` | Wins, podiums and DNF rate per driver |
+| `GET /analysis/driver/average-lap-time` | Average lap time by driver and circuit |
+| `GET /analysis/driver/sector-analysis` | Sector times |
+| `GET /analysis/driver/consistency` | Lap-time consistency |
+| `GET /analysis/driver/pit-stop-analysis` | Pit stop durations |
+| `GET /analysis/driver/position-changes` | Positions gained or lost |
+| `GET /analysis/team/performance-ranking` | Team ranking |
+| `GET /analysis/team/consistency` | Driver-pair comparison |
+| `GET /analysis/circuit/performance` | Performance by circuit |
+| `GET /analysis/race/results` | Race results |
+| `GET /analysis/race/strategy` | Race strategy |
+| `GET /analysis/season/championship` | Championship progress |
+| `GET /predict/options`, `POST /predict` | Race position estimate |
 
----
+Most analysis endpoints accept `season`, `driver_id` or `driver_number`, `constructor_id`, `circuit_id`, `limit` and `offset`.
 
-## 📊 Veri Güvenliği
+## Race position estimate
 
-Tüm SQL sorguları parameterized (hazırlanmış ifadeler) kullanır:
-```python
-# ✅ Güvenli
-conn.execute(text("SELECT * FROM results WHERE driver = :driver_id"), 
-             {"driver_id": driver_id})
+Pick a driver, a starting position, the track temperature and whether it rains, and the app estimates the finishing position. No model is trained. The estimate is built from historical averages and shows how it was put together:
 
-# ❌ ASLA
-f"SELECT * FROM results WHERE driver = '{driver_id}'"
+```
+estimate = usual finish from this grid slot (dry races)
+         + what the team usually gains or loses
+         + what the driver adds on top of the team
+         + how rain or a hot track shuffles the order toward the middle
 ```
 
----
+Every effect is shrunk toward zero when it rests on few races. To check accuracy, the latest races are held out, estimated from the earlier ones and compared with the baseline "a driver finishes where they start". Safety cars and retirements cannot be predicted.
 
-<div align="center">
-<img src="https://img.shields.io/badge/FastAPI-Python-009688?style=flat-square&logo=fastapi" />
-<img src="https://img.shields.io/badge/PostgreSQL-Database-316192?style=flat-square&logo=postgresql" />
-<img src="https://img.shields.io/badge/React-19-61DAFB?style=flat-square&logo=react" />
-<img src="https://img.shields.io/badge/SQLAlchemy-ORM-D71F00?style=flat-square" />
-<img src="https://img.shields.io/badge/F1-2024--2025-E10600?style=flat-square" />
+```bash
+python -m analysis.collect --years 2024 2025   # download results, grid and weather from OpenF1
+python -m analysis.report                      # accuracy on held-out races
+python -m pytest test_ml.py test_collect.py    # tests (synthetic data)
+```
 
-</div>
+Data format and sources: [`analysis/data/README.md`](analysis/data/README.md).
 
----
+## Current limitations
+
+- The "Win Probability" card and the telemetry chart on the dashboard use placeholder data and do not read from the database.
+- The step that downloads raw OpenF1 JSON into `f1_data/` is not included in the worker.
+- Analysis covers the 2024 and 2025 seasons only.
+
+## Project structure
+
+```
+backend/app/       FastAPI app, routes and analysis service
+worker/            collectors, loaders and cleaning for OpenF1 data
+database/          schema.sql and init_db.py
+analysis/          statistics-based race position estimate and data collector
+frontend/src/      React pages, dashboard components and API services
+test_backend.py    backend checks
+test_ml.py, test_collect.py   tests for the estimate and the collector
+```
+
+## Security
+
+All SQL uses parameterized queries. Credentials are read from environment variables, so keep `.env` files out of version control (they are git-ignored).
 
 ## License
 
