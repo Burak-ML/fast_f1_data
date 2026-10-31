@@ -187,3 +187,9 @@ f"SELECT * FROM results WHERE driver = '{driver_id}'"
 <img src="https://img.shields.io/badge/F1-2024--2025-E10600?style=flat-square" />
 
 </div>
+
+---
+
+## License
+
+MIT. See [LICENSE](LICENSE).

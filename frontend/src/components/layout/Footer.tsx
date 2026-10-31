@@ -5,7 +5,7 @@ export function Footer() {
         F1 ANALYTIX
       </div>
       <p className="font-label-sm text-label-sm text-on-surface-variant uppercase">
-        © 2024 F1 ANALYTIX. ALL RIGHTS RESERVED.
+        © 2026 F1 ANALYTIX. MIT LICENSE.
       </p>
       <div className="font-label-sm text-label-sm text-on-surface-variant uppercase text-center md:text-right max-w-sm">
         DIVE DEEPER INTO DETAILED RACE FORECASTS AND HISTORIC MODEL INSIGHTS.
