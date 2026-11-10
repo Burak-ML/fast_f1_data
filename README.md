@@ -1,9 +1,10 @@
 # F1 Data Analysis
 
-[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-![Python](https://img.shields.io/badge/Python-FastAPI-009688?logo=fastapi&logoColor=white)
-![PostgreSQL](https://img.shields.io/badge/PostgreSQL-316192?logo=postgresql&logoColor=white)
-![React](https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=black)
+**A Formula 1 analytics pipeline and dashboard for driver, team, circuit and race-performance comparisons.**
+
+Structured 2024–2025 session data flows through PostgreSQL and FastAPI into a React interface. The repository also explores an explainable, statistics-based finishing-position estimate—not a trained machine-learning model.
+
+**Explore:** [Features](#features) · [Architecture](#architecture) · [Setup](#getting-started) · [Limitations](#current-limitations)
 
 **A Formula 1 analytics app for the 2024 and 2025 seasons: PostgreSQL queries, a FastAPI backend and a React dashboard.**
 
