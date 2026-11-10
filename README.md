@@ -6,8 +6,6 @@ Structured 2024–2025 session data flows through PostgreSQL and FastAPI into a 
 
 **Explore:** [Features](#features) · [Architecture](#architecture) · [Setup](#getting-started) · [Limitations](#current-limitations)
 
-**A Formula 1 analytics app for the 2024 and 2025 seasons: PostgreSQL queries, a FastAPI backend and a React dashboard.**
-
 Race results, lap times, pit stops and weather live in separate tables. This project brings them together behind one API so drivers, teams and circuits can be compared in an interactive interface. It also includes a small statistical module that estimates where a driver is likely to finish.
 
 ## Features
